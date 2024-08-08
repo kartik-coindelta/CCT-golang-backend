@@ -6,13 +6,11 @@ import (
 	"go.mongodb.org/mongo-driver/bson/primitive"
 )
 
-// Document represents a sub-document schema for supporting documents
 type Document struct {
 	DocumentHash string `bson:"documentHash" json:"documentHash"`
 	URL          string `bson:"url" json:"url"`
 }
 
-// BCA represents the BCA schema in the MongoDB database
 type BCA struct {
 	ID                        primitive.ObjectID  `bson:"_id,omitempty" json:"id,omitempty"`
 	BCAID                     *primitive.ObjectID `bson:"bcaId,omitempty" json:"bcaId,omitempty"`

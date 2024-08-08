@@ -8,14 +8,14 @@ import (
 
 // User represents a user in the MongoDB database
 type User struct {
-	ID         primitive.ObjectID `bson:"_id,omitempty" json:"id,omitempty"`
-	FirstName  *string            `bson:"firstName,omitempty" json:"firstName,omitempty"`
-	LastName   *string            `bson:"lastName,omitempty" json:"lastName,omitempty"`
-	CaseNumber *int               `bson:"caseNumber,omitempty" json:"caseNumber,omitempty"`
-	ClientName *string            `bson:"clientName,omitempty" json:"clientName,omitempty"`
-	Email      *string            `bson:"email,omitempty" json:"email,omitempty"`
-	// UserName                  *string             `bson:"userName,omitempty" json:"userName,omitempty"`
-	// Password                  *string             `bson:"password,omitempty" json:"password,omitempty"`
+	ID                        primitive.ObjectID  `bson:"_id,omitempty" json:"id,omitempty"`
+	FirstName                 *string             `bson:"firstName,omitempty" json:"firstName,omitempty"`
+	LastName                  *string             `bson:"lastName,omitempty" json:"lastName,omitempty"`
+	CaseNumber                *int                `bson:"caseNumber,omitempty" json:"caseNumber,omitempty"`
+	ClientName                *string             `bson:"clientName,omitempty" json:"clientName,omitempty"`
+	Email                     *string             `bson:"email,omitempty" json:"email,omitempty"`
+	UserName                  *string             `bson:"userName,omitempty" json:"userName,omitempty"`
+	Password                  *string             `bson:"password,omitempty" json:"password,omitempty"`
 	FatherName                *string             `bson:"fatherName,omitempty" json:"fatherName,omitempty"`
 	MotherName                *string             `bson:"motherName,omitempty" json:"motherName,omitempty"`
 	DateOfBirth               *time.Time          `bson:"dateOfBirth,omitempty" json:"dateOfBirth,omitempty"`

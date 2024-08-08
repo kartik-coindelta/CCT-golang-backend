@@ -1,15 +1,13 @@
 package main
 
 import (
-	controllers "CCT-GOLANG-BACKEND/controllers/auth"
-
-	"github.com/gin-gonic/gin"
+	"CCT-GOLANG-BACKEND/db"
+	"CCT-GOLANG-BACKEND/routes"
 )
 
 func main() {
-	controllers.InitMongo() // Initialize MongoDB client
+	db.ConnectDB()
 
-	router := gin.Default()
-	router.POST("/signUp", controllers.SignUp)
-	router.Run(":8080")
+	r := routes.SetupRouter()
+	r.Run(":8080")
 }
