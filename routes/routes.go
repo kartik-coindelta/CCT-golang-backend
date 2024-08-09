@@ -6,11 +6,9 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-func SetupRouter() *gin.Engine {
-	r := gin.Default()
-
-	r.POST("/signup", controllers.Signup)
-	r.POST("/login", controllers.Login)
-
-	return r
+func SetupRoutes(router *gin.Engine) {
+	// Define routes
+	router.POST("/signup", controllers.Signup)
+	router.POST("/login", controllers.Login)
+	router.POST("/register-company", controllers.RegisterCompany) // Ensure this route is defined
 }

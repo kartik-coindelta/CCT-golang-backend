@@ -1,12 +1,12 @@
 package controllers
 
 import (
-	"CCT-GOLANG-BACKEND/db"
-	"CCT-GOLANG-BACKEND/models"
 	"context"
 	"net/http"
-	"os"
 	"time"
+
+	"CCT-GOLANG-BACKEND/db"
+	"CCT-GOLANG-BACKEND/models"
 
 	"github.com/gin-gonic/gin"
 	"go.mongodb.org/mongo-driver/bson"
@@ -14,12 +14,19 @@ import (
 	"golang.org/x/crypto/bcrypt"
 )
 
-func hashPasswordWithSecret(password, secretKey string) (string, error) {
-	combined := password + secretKey
-	hashedPassword, err := bcrypt.GenerateFromPassword([]byte(combined), bcrypt.DefaultCost)
-	return string(hashedPassword), err
+// Concatenate password with secret key and hash it
+func hashPassword(password string) (string, error) {
+	// Concatenate password with secret key
+	concatenatedPassword := password + string(bcryptSecretKey)
+
+	bytes, err := bcrypt.GenerateFromPassword([]byte(concatenatedPassword), bcrypt.DefaultCost)
+	if err != nil {
+		return "", err
+	}
+	return string(bytes), nil
 }
 
+// Signup handles user registration
 func Signup(c *gin.Context) {
 	var input models.BCA
 	if err := c.ShouldBindJSON(&input); err != nil {
@@ -27,14 +34,13 @@ func Signup(c *gin.Context) {
 		return
 	}
 
-	secretKey := os.Getenv("SECRET_KEY")
-
 	collection := db.GetCollection("BCA")
 	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
 	defer cancel()
 
 	var existingUser models.BCA
 
+	// Check if email or username already exists
 	err := collection.FindOne(ctx, bson.M{"email": input.Email}).Decode(&existingUser)
 	if err == nil {
 		c.JSON(http.StatusConflict, gin.H{"error": "Email already registered"})
@@ -47,13 +53,13 @@ func Signup(c *gin.Context) {
 		return
 	}
 
-	hashedPassword, err := hashPasswordWithSecret(*input.Password, secretKey)
+	// Encrypt the password with secret key concatenation
+	hashedPassword, err := hashPassword(*input.Password)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "Error encrypting password"})
 		return
 	}
 
-	// Register new user with role set to "BCA"
 	newUser := models.BCA{
 		ID:                        primitive.NewObjectID(),
 		UserName:                  input.UserName,

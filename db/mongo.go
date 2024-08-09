@@ -3,32 +3,30 @@ package db
 import (
 	"context"
 	"log"
-	"time"
 
 	"go.mongodb.org/mongo-driver/mongo"
 	"go.mongodb.org/mongo-driver/mongo/options"
 )
 
-var Client *mongo.Client
+var client *mongo.Client
 
-func ConnectDB() {
-	clientOptions := options.Client().ApplyURI("mongodb://localhost:27017")
-	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
-	defer cancel()
+func init() {
+	var err error
+	// Hardcode the MongoDB URI here
+	mongoURI := "mongodb://localhost:27017"
 
-	client, err := mongo.Connect(ctx, clientOptions)
+	clientOptions := options.Client().ApplyURI(mongoURI)
+	client, err = mongo.Connect(context.TODO(), clientOptions)
 	if err != nil {
 		log.Fatal(err)
 	}
 
-	if err := client.Ping(ctx, nil); err != nil {
+	err = client.Ping(context.TODO(), nil)
+	if err != nil {
 		log.Fatal(err)
 	}
-
-	log.Println("Connected to MongoDB!")
-	Client = client
 }
 
-func GetCollection(collectionName string) *mongo.Collection {
-	return Client.Database("CCTdb").Collection(collectionName)
+func GetCollection(name string) *mongo.Collection {
+	return client.Database("CCTdb").Collection(name)
 }

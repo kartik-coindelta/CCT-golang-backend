@@ -1,19 +1,17 @@
 package main
 
 import (
-	"CCT-GOLANG-BACKEND/db"
 	"CCT-GOLANG-BACKEND/routes"
 
-	"github.com/joho/godotenv"
+	"github.com/gin-gonic/gin"
 )
 
 func main() {
-	db.ConnectDB()
-	err := godotenv.Load()
-	if err != nil {
-		// Handle the error
-		panic(err)
-	}
-	r := routes.SetupRouter()
-	r.Run(":8080")
+	router := gin.Default()
+
+	// Set up routes
+	routes.SetupRoutes(router)
+
+	// Start the server
+	router.Run(":8080")
 }
