@@ -8,7 +8,10 @@ import (
 
 func SetupRoutes(router *gin.Engine) {
 	// Define routes
-	router.POST("/signup", controllers.Signup)
+	router.POST("/signup", controllers.SignUp)
 	router.POST("/login", controllers.Login)
-	router.POST("/register-company", controllers.RegisterCompany) // Ensure this route is defined
+	router.POST("/loginCompany", controllers.Login)
+	router.POST("/loginUser", controllers.Login)
+	router.POST("/registerCompany", controllers.RegisterCompany)
+	router.POST("/registerUser", controllers.RegisterUser)
 }

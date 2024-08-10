@@ -1,33 +1,19 @@
 package controllers
 
 import (
+	"CCT-GOLANG-BACKEND/db"
+	"CCT-GOLANG-BACKEND/middleware"
+	"CCT-GOLANG-BACKEND/models"
 	"context"
 	"net/http"
 	"time"
 
-	"CCT-GOLANG-BACKEND/db"
-	"CCT-GOLANG-BACKEND/models"
-
 	"github.com/gin-gonic/gin"
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/bson/primitive"
-	"golang.org/x/crypto/bcrypt"
 )
 
-// Concatenate password with secret key and hash it
-func hashPassword(password string) (string, error) {
-	// Concatenate password with secret key
-	concatenatedPassword := password + string(bcryptSecretKey)
-
-	bytes, err := bcrypt.GenerateFromPassword([]byte(concatenatedPassword), bcrypt.DefaultCost)
-	if err != nil {
-		return "", err
-	}
-	return string(bytes), nil
-}
-
-// Signup handles user registration
-func Signup(c *gin.Context) {
+func SignUp(c *gin.Context) {
 	var input models.BCA
 	if err := c.ShouldBindJSON(&input); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
@@ -40,26 +26,28 @@ func Signup(c *gin.Context) {
 
 	var existingUser models.BCA
 
-	// Check if email or username already exists
+	// Check if email already exists
 	err := collection.FindOne(ctx, bson.M{"email": input.Email}).Decode(&existingUser)
 	if err == nil {
 		c.JSON(http.StatusConflict, gin.H{"error": "Email already registered"})
 		return
 	}
 
+	// Check if username already exists
 	err = collection.FindOne(ctx, bson.M{"userName": input.UserName}).Decode(&existingUser)
 	if err == nil {
 		c.JSON(http.StatusConflict, gin.H{"error": "Username already taken"})
 		return
 	}
 
-	// Encrypt the password with secret key concatenation
-	hashedPassword, err := hashPassword(*input.Password)
+	// Encrypt the password
+	hashedPassword, err := middleware.HashPassword(*input.Password)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "Error encrypting password"})
 		return
 	}
 
+	// Create new user with role set to "BCA"
 	newUser := models.BCA{
 		ID:                        primitive.NewObjectID(),
 		UserName:                  input.UserName,

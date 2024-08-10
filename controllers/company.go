@@ -1,18 +1,20 @@
 package controllers
 
 import (
+	"CCT-GOLANG-BACKEND/db"
+	"CCT-GOLANG-BACKEND/middleware"
+	"CCT-GOLANG-BACKEND/models"
 	"context"
 	"net/http"
 	"strings"
 	"time"
 
-	"CCT-GOLANG-BACKEND/db"
-	"CCT-GOLANG-BACKEND/models"
-
 	"github.com/gin-gonic/gin"
+	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/bson/primitive"
 )
 
+// RegisterCompany handles company registration
 func RegisterCompany(c *gin.Context) {
 	var input models.Company
 	if err := c.ShouldBindJSON(&input); err != nil {
@@ -28,7 +30,7 @@ func RegisterCompany(c *gin.Context) {
 	}
 
 	tokenStr = strings.TrimPrefix(tokenStr, "Bearer ")
-	_, err := ValidateToken(tokenStr)
+	_, err := middleware.ValidateToken(tokenStr)
 	if err != nil {
 		c.JSON(http.StatusUnauthorized, gin.H{"error": "Invalid token"})
 		return
@@ -38,12 +40,35 @@ func RegisterCompany(c *gin.Context) {
 	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
 	defer cancel()
 
-	company := models.Company{
+	// Check if company email already exists
+	var existingCompany models.Company
+	err = collection.FindOne(ctx, bson.M{"email": input.Email}).Decode(&existingCompany)
+	if err == nil {
+		c.JSON(http.StatusConflict, gin.H{"error": "Email already registered"})
+		return
+	}
+
+	// Check if company username already exists
+	err = collection.FindOne(ctx, bson.M{"userName": input.UserName}).Decode(&existingCompany)
+	if err == nil {
+		c.JSON(http.StatusConflict, gin.H{"error": "Username already taken"})
+		return
+	}
+
+	// Hash the password using bcrypt
+	hashedPassword, err := middleware.HashPassword(*input.Password)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Error encrypting password"})
+		return
+	}
+
+	// Create new company with hashed password
+	newCompany := models.Company{
 		ID:                        primitive.NewObjectID(),
 		Name:                      input.Name,
 		Email:                     input.Email,
 		UserName:                  input.UserName,
-		Password:                  input.Password, // You might want to hash this as well
+		Password:                  &hashedPassword, // Store hashed password
 		PhoneNumber:               input.PhoneNumber,
 		Address:                   input.Address,
 		Line2:                     input.Line2,
@@ -67,7 +92,7 @@ func RegisterCompany(c *gin.Context) {
 		UpdatedAt:                 time.Now(),
 	}
 
-	_, err = collection.InsertOne(ctx, company)
+	_, err = collection.InsertOne(ctx, newCompany)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "Error creating company"})
 		return
