@@ -14,7 +14,7 @@ var jwtSecretKey = []byte(os.Getenv("JWT_SECRET_KEY"))
 func GenerateToken(userID string, role string) (string, error) {
 	claims := jwt.MapClaims{
 		"userID": userID,
-		"exp":    time.Now().Add(time.Hour * 24).Unix(), // Token expires in 24 hours
+		"exp":    time.Now().Add(time.Minute * 10).Unix(), // Token expires in 24 hours
 		"role":   role,
 	}
 
