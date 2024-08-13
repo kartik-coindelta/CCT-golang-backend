@@ -8,18 +8,6 @@ require (
 )
 
 require (
-	github.com/fatih/color v1.9.0 // indirect
-	github.com/fsnotify/fsnotify v1.4.9 // indirect
-	github.com/githubnemo/CompileDaemon v1.4.0 // indirect
-	github.com/labstack/echo/v4 v4.12.0 // indirect
-	github.com/labstack/gommon v0.4.2 // indirect
-	github.com/mattn/go-colorable v0.1.13 // indirect
-	github.com/radovskyb/watcher v1.0.7 // indirect
-	github.com/valyala/bytebufferpool v1.0.0 // indirect
-	github.com/valyala/fasttemplate v1.2.2 // indirect
-)
-
-require (
 	github.com/golang-jwt/jwt/v4 v4.5.0
 	github.com/golang/snappy v0.0.4 // indirect
 	github.com/klauspost/compress v1.17.7 // indirect

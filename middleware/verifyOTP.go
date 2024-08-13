@@ -22,7 +22,7 @@ func VerifyOTP(c *gin.Context) {
 	}
 
 	collections := []string{"company", "BCA", "user"}
-	for _, collectionName := range collections {
+	for _, collectionName := range collections { // Corrected here
 		collection := db.GetCollection(collectionName)
 		ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
 		defer cancel()
@@ -31,6 +31,8 @@ func VerifyOTP(c *gin.Context) {
 		var result interface{}
 		var storedOTP *int
 		var storedTimestamp *time.Time
+		var role string
+		var id string
 
 		switch collectionName {
 		case "company":
@@ -46,6 +48,8 @@ func VerifyOTP(c *gin.Context) {
 			}
 			storedOTP = company.VerificationCode
 			storedTimestamp = company.VerificationCodeTimestamp
+			role = *company.Role
+			id = company.ID.Hex()
 
 		case "BCA":
 			var bca models.BCA
@@ -60,6 +64,8 @@ func VerifyOTP(c *gin.Context) {
 			}
 			storedOTP = bca.VerificationCode
 			storedTimestamp = bca.VerificationCodeTimestamp
+			role = *bca.Role
+			id = bca.ID.Hex()
 
 		case "user":
 			var user models.User
@@ -74,6 +80,8 @@ func VerifyOTP(c *gin.Context) {
 			}
 			storedOTP = user.VerificationCode
 			storedTimestamp = user.VerificationCodeTimestamp
+			role = *user.Role
+			id = user.ID.Hex()
 		}
 
 		// Check OTP
@@ -81,8 +89,17 @@ func VerifyOTP(c *gin.Context) {
 			if storedTimestamp != nil {
 				expiryTime := storedTimestamp.Add(5 * time.Minute) // Example expiry of 5 minutes
 				if time.Now().Before(expiryTime) {
+					// Use the existing GenerateToken function from auth.go
+					token, err := GenerateToken(id, role) // Ensure this function is correctly imported
+					if err != nil {
+						c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to generate token"})
+						return
+					}
 
-					c.JSON(http.StatusOK, gin.H{"message": "OTP verified successfully"})
+					c.JSON(http.StatusOK, gin.H{
+						"message": "OTP verified successfully",
+						"token":   token,
+					})
 					return
 				} else {
 					c.JSON(http.StatusBadRequest, gin.H{"error": "OTP expired"})
