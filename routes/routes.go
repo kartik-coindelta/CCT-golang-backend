@@ -2,6 +2,7 @@ package routes
 
 import (
 	"CCT-GOLANG-BACKEND/controllers"
+	"CCT-GOLANG-BACKEND/middleware"
 
 	"github.com/gin-gonic/gin"
 )
@@ -14,6 +15,8 @@ func SetupRoutes(router *gin.Engine) {
 	router.POST("/loginUser", controllers.Login)
 	router.POST("/registerCompany", controllers.RegisterCompany)
 	router.POST("/registerUser", controllers.RegisterUser)
+
+	router.POST("/verifyOTP", middleware.VerifyOTP)
 
 	SetupBCARoutes(router)
 	CompanyRoutes(router)

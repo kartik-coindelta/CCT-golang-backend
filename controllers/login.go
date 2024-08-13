@@ -5,7 +5,6 @@ import (
 	"CCT-GOLANG-BACKEND/middleware"
 	"CCT-GOLANG-BACKEND/models"
 	"context"
-	"log"
 	"net/http"
 	"time"
 
@@ -25,80 +24,134 @@ func Login(c *gin.Context) {
 		return
 	}
 
-	collectionNames := []string{"BCA", "company", "user"}
+	// Check if email is provided
+	if input.Email != nil && *input.Email != "" {
+		collections := []string{"company", "BCA", "user"}
+		var user models.User
+		var company models.Company
+		var bca models.BCA
 
-	var user models.User
-	var company models.Company
-	var bca models.BCA
+		for _, collectionName := range collections {
+			collection := db.GetCollection(collectionName)
+			ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
+			defer cancel()
 
-	for _, collectionName := range collectionNames {
-		collection := db.GetCollection(collectionName)
-		ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
-		defer cancel()
-
-		filter := bson.M{}
-		if input.Email != nil && *input.Email != "" {
-			filter["email"] = input.Email
-		} else if input.UserName != nil && *input.UserName != "" {
-			filter["userName"] = input.UserName
-		} else {
-			c.JSON(http.StatusBadRequest, gin.H{"error": "Email or Username required"})
-			return
-		}
-
-		var result interface{}
-		switch collectionName {
-		case "BCA":
-			result = &bca
-			log.Println("U....JUST...LOGIN....TO...BCA.....")
-		case "company":
-			result = &company
-			log.Println("U....JUST...LOGIN....TO...COMPANY.....")
-		case "user":
-			result = &user
-			log.Println("U....JUST...LOGIN....TO...USER.....")
-		}
-
-		err := collection.FindOne(ctx, filter).Decode(result)
-		if err == nil {
-			// Compare password
-			var hashedPassword string
-			var role string
-			var id primitive.ObjectID
-
+			filter := bson.M{"email": input.Email}
+			var result interface{}
 			switch collectionName {
 			case "BCA":
-				hashedPassword = *bca.Password
-				role = *bca.Role
-				id = bca.ID
+				result = &bca
 			case "company":
-				hashedPassword = *company.Password
-				role = *company.Role
-				id = company.ID
-				log.Println(role)
+				result = &company
 			case "user":
-				hashedPassword = *user.Password
-				role = *user.Role
-				id = user.ID
-				log.Println(role)
+				result = &user
 			}
 
-			err = middleware.ComparePassword(hashedPassword, *input.Password)
-			if err != nil {
+			err := collection.FindOne(ctx, filter).Decode(result)
+			if err == nil {
+				// Email exists, call SendLoginOTP
+				otpResult, err := middleware.SendLoginOTP(*input.Email)
+				if err != nil {
+					c.JSON(http.StatusInternalServerError, gin.H{"error": "Error sending OTP"})
+					return
+				}
+
+				// Update OTP and timestamp in the database
+				updateFilter := bson.M{"email": input.Email}
+				update := bson.M{
+					"$set": bson.M{
+						"verificationCode":          otpResult["verificationCode"],
+						"verificationCodeTimestamp": time.Now(),
+					},
+				}
+				updateResult := collection.FindOneAndUpdate(ctx, updateFilter, update)
+				if err := updateResult.Err(); err != nil {
+					c.JSON(http.StatusInternalServerError, gin.H{"error": "Error updating OTP"})
+					return
+				}
+
+				c.JSON(http.StatusOK, gin.H{"message": "OTP sent to your email", "verificationCode": otpResult["verificationCode"]})
+				return
+			} else if err.Error() == "mongo: no documents in result" {
 				continue
-			}
-
-			// Generate JWT Token
-			token, err := middleware.GenerateToken(id.Hex(), role)
-			if err != nil {
-				c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to generate token"})
+			} else {
+				c.JSON(http.StatusInternalServerError, gin.H{"error": "Error checking email"})
 				return
 			}
-
-			c.JSON(http.StatusOK, gin.H{"message": "Login successful", "token": token})
-			return
 		}
+
+		// Email not found in any collection
+		c.JSON(http.StatusNotFound, gin.H{"error": "This email is not registered with us."})
+		return
 	}
 
-	c.JSON(http.StatusUnauthorized, gin.H{"error": "Invalid email/username or password"})
+	// Check if UserName and Password are provided
+	if input.UserName != nil && *input.UserName != "" && input.Password != nil && *input.Password != "" {
+		collections := []string{"company", "BCA", "user"}
+		var user models.User
+		var company models.Company
+		var bca models.BCA
+
+		for _, collectionName := range collections {
+			collection := db.GetCollection(collectionName)
+			ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
+			defer cancel()
+
+			filter := bson.M{"userName": input.UserName}
+			var result interface{}
+			switch collectionName {
+			case "BCA":
+				result = &bca
+			case "company":
+				result = &company
+			case "user":
+				result = &user
+			}
+
+			err := collection.FindOne(ctx, filter).Decode(result)
+			if err == nil {
+				// UserName found, check password
+				var hashedPassword string
+				var role string
+				var id primitive.ObjectID
+
+				switch collectionName {
+				case "BCA":
+					hashedPassword = *bca.Password
+					role = *bca.Role
+					id = bca.ID
+				case "company":
+					hashedPassword = *company.Password
+					role = *company.Role
+					id = company.ID
+				case "user":
+					hashedPassword = *user.Password
+					role = *user.Role
+					id = user.ID
+				}
+
+				err = middleware.ComparePassword(hashedPassword, *input.Password)
+				if err == nil {
+					// Generate JWT Token
+					token, err := middleware.GenerateToken(id.Hex(), role)
+					if err != nil {
+						c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to generate token"})
+						return
+					}
+
+					c.JSON(http.StatusOK, gin.H{"message": "Login successful", "token": token})
+					return
+				} else {
+					c.JSON(http.StatusUnauthorized, gin.H{"error": "Invalid password"})
+					return
+				}
+			}
+		}
+
+		// UserName not found in any collection
+		c.JSON(http.StatusNotFound, gin.H{"error": "This username is not registered with us."})
+		return
+	}
+
+	c.JSON(http.StatusBadRequest, gin.H{"error": "Email or Username and Password required"})
 }
