@@ -3,30 +3,44 @@ package db
 import (
 	"context"
 	"log"
+	"sync"
 
 	"go.mongodb.org/mongo-driver/mongo"
 	"go.mongodb.org/mongo-driver/mongo/options"
 )
 
-var client *mongo.Client
+var (
+	clientInstance      *mongo.Client
+	clientInstanceError error
+	mongoOnce           sync.Once
+)
+
+const (
+	CONNECTIONSTRING = "mongodb://localhost:27017"
+	DB               = "CCTdb"
+)
 
 func init() {
-	var err error
-	// Hardcode the MongoDB URI here
-	mongoURI := "mongodb://localhost:27017"
+	clientOptions := options.Client().ApplyURI(CONNECTIONSTRING)
 
-	clientOptions := options.Client().ApplyURI(mongoURI)
-	client, err = mongo.Connect(context.TODO(), clientOptions)
-	if err != nil {
-		log.Fatal(err)
-	}
+	mongoOnce.Do(func() {
+		clientInstance, clientInstanceError = mongo.Connect(context.TODO(), clientOptions)
+		if clientInstanceError != nil {
+			log.Fatal(clientInstanceError)
+		}
 
-	err = client.Ping(context.TODO(), nil)
-	if err != nil {
-		log.Fatal(err)
-	}
+		err := clientInstance.Ping(context.TODO(), nil)
+		if err != nil {
+			log.Fatal(err)
+		}
+	})
 }
 
-func GetCollection(name string) *mongo.Collection {
-	return client.Database("CCTdb").Collection(name)
+func GetMongoClient() *mongo.Client {
+	return clientInstance
+}
+
+func GetCollection(collectionName string) *mongo.Collection {
+	client := GetMongoClient()
+	return client.Database(DB).Collection(collectionName)
 }

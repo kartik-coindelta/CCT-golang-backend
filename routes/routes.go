@@ -21,4 +21,6 @@ func SetupRoutes(router *gin.Engine) {
 	SetupBCARoutes(router)
 	CompanyRoutes(router)
 	UserRoutes(router)
+
+	UserVerificationRequestRoutes(router)
 }
