@@ -1,7 +1,7 @@
 package routes
 
 import (
-	"CCT-GOLANG-BACKEND/controllers"
+	controllers "CCT-GOLANG-BACKEND/controllers/userVerificationRequest"
 
 	"github.com/gin-gonic/gin"
 )

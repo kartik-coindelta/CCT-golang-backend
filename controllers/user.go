@@ -37,6 +37,19 @@ func RegisterUser(c *gin.Context) {
 		return
 	}
 
+	// Extract Company ID from token claims
+	companyIDStr, ok := claims["userID"].(string)
+	if !ok {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Company ID is missing in token"})
+		return
+	}
+
+	userID, err := primitive.ObjectIDFromHex(companyIDStr)
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid Company ID"})
+		return
+	}
+
 	var input models.User
 	if err := c.ShouldBindJSON(&input); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
@@ -87,7 +100,7 @@ func RegisterUser(c *gin.Context) {
 		PhoneNumber:               input.PhoneNumber,
 		ImgURL:                    input.ImgURL,
 		Role:                      input.Role,
-		CompanyID:                 input.CompanyID,
+		CompanyID:                 userID,
 		VerificationCode:          input.VerificationCode,
 		Address:                   input.Address,
 		Address1:                  input.Address1,

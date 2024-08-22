@@ -21,6 +21,7 @@ type Company struct {
 	State                     *string            `bson:"state,omitempty" json:"state,omitempty"`
 	City                      *string            `bson:"city,omitempty" json:"city,omitempty"`
 	Country                   *string            `bson:"country,omitempty" json:"country,omitempty"`
+	BCAID                     primitive.ObjectID `bson:"bcaId" json:"userId"`
 	WebsiteLink               *string            `bson:"websiteLink,omitempty" json:"websiteLink,omitempty"`
 	NoOfEmployees             *int               `bson:"noOfEmployees,omitempty" json:"noOfEmployees,omitempty"`
 	CompanyRegistrationNumber *int               `bson:"companyRegistrationNumber,omitempty" json:"companyRegistrationNumber,omitempty"`

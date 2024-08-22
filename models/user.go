@@ -23,7 +23,7 @@ type User struct {
 	PhoneNumber               *int                `bson:"phoneNumber,omitempty" json:"phoneNumber,omitempty"`
 	ImgURL                    *string             `bson:"imgURL,omitempty" json:"imgURL,omitempty"`
 	Role                      *string             `bson:"role,omitempty" json:"role,omitempty"`
-	CompanyID                 *primitive.ObjectID `bson:"companyId,omitempty" json:"companyId,omitempty"`
+	CompanyID                 primitive.ObjectID  `bson:"companyId" json:"userId"`
 	CaseID                    *primitive.ObjectID `bson:"caseId,omitempty" json:"caseId,omitempty"`
 	VerificationCode          *int                `bson:"verificationCode,omitempty" json:"verificationCode,omitempty"`
 	Address                   *string             `bson:"address,omitempty" json:"address,omitempty"`

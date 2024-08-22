@@ -30,9 +30,28 @@ func RegisterCompany(c *gin.Context) {
 	}
 
 	tokenStr = strings.TrimPrefix(tokenStr, "Bearer ")
-	_, err := middleware.ValidateToken(tokenStr)
+	claims, err := middleware.ValidateToken(tokenStr)
 	if err != nil {
 		c.JSON(http.StatusUnauthorized, gin.H{"error": "Invalid token"})
+		return
+	}
+
+	role, ok := claims["role"].(string)
+	if !ok || role != "BCA" {
+		c.JSON(http.StatusForbidden, gin.H{"error": "Permission denied"})
+		return
+	}
+
+	// Extract BCA ID from token claims
+	bcaIDStr, ok := claims["userID"].(string)
+	if !ok {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "BCA ID is missing in token"})
+		return
+	}
+
+	userID, err := primitive.ObjectIDFromHex(bcaIDStr)
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid BCA ID"})
 		return
 	}
 
@@ -62,7 +81,7 @@ func RegisterCompany(c *gin.Context) {
 		return
 	}
 
-	// Create new company with hashed password
+	// Create new company with hashed password and BCA ID
 	newCompany := models.Company{
 		ID:                        primitive.NewObjectID(),
 		Name:                      input.Name,
@@ -88,6 +107,7 @@ func RegisterCompany(c *gin.Context) {
 		VerificationCode:          input.VerificationCode,
 		VerificationCodeTimestamp: input.VerificationCodeTimestamp,
 		PrePayment:                input.PrePayment,
+		BCAID:                     userID, // Store BCA ID from token
 		CreatedAt:                 time.Now(),
 		UpdatedAt:                 time.Now(),
 	}
