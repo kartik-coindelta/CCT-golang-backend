@@ -20,7 +20,7 @@ func SignUp(c *gin.Context) {
 		return
 	}
 
-	collection := db.GetCollection("BCA")
+	collection := db.GetCollection("bcas")
 	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
 	defer cancel()
 
@@ -47,39 +47,48 @@ func SignUp(c *gin.Context) {
 		return
 	}
 
-	// Create new user with role set to "BCA"
+	// Create new user with role set to "bca"
+	now := time.Now()
+
 	newUser := models.BCA{
-		ID:                        primitive.NewObjectID(),
-		UserName:                  input.UserName,
-		Email:                     input.Email,
-		Password:                  &hashedPassword,
-		FirstName:                 input.FirstName,
-		LastName:                  input.LastName,
-		PhoneNumber:               input.PhoneNumber,
-		Line1:                     input.Line1,
-		Line2:                     input.Line2,
-		Zipcode:                   input.Zipcode,
-		CompanyRegistrationNumber: input.CompanyRegistrationNumber,
-		WebsiteLink:               input.WebsiteLink,
-		NoOfEmployees:             input.NoOfEmployees,
-		UserWallet:                input.UserWallet,
-		SupportingDocuments:       input.SupportingDocuments,
-		LogoURL:                   input.LogoURL,
-		Status:                    input.Status,
-		Role:                      input.Role,
-		VendorName:                input.VendorName,
-		ManagerName:               input.ManagerName,
-		Address:                   input.Address,
-		City:                      input.City,
-		State:                     input.State,
-		GST:                       input.GST,
-		Country:                   input.Country,
-		AdditionalRemark:          input.AdditionalRemark,
-		HasStaffAccess:            input.HasStaffAccess,
-		VerificationCode:          input.VerificationCode,
-		VerificationCodeTimestamp: input.VerificationCodeTimestamp,
-		CreatedAt:                 time.Now(),
-		UpdatedAt:                 time.Now(),
+		ID:                        primitive.NewObjectID(),         // New ObjectID for the BCA
+		BCAId:                     input.BCAId,                     // BCA ID reference if needed
+		Name:                      input.Name,                      // Name of the BCA
+		FirstName:                 input.FirstName,                 // First Name of the BCA user
+		LastName:                  input.LastName,                  // Last Name of the BCA user
+		UserName:                  input.UserName,                  // Username
+		Email:                     input.Email,                     // Email
+		Password:                  &hashedPassword,                 // Hashed password
+		PhoneNumber:               input.PhoneNumber,               // Phone number
+		Line1:                     input.Line1,                     // Line 1 of the address
+		Line2:                     input.Line2,                     // Line 2 of the address
+		Zipcode:                   input.Zipcode,                   // Zipcode
+		CompanyRegistrationNumber: input.CompanyRegistrationNumber, // Company registration number
+		WebsiteLink:               input.WebsiteLink,               // Website link
+		NoOfEmployees:             input.NoOfEmployees,             // Number of employees
+		UserWallet:                input.UserWallet,                // User wallet
+		SupportingDocuments:       input.SupportingDocuments,       // Supporting documents
+		LogoURL:                   input.LogoURL,                   // Logo URL
+		Status:                    input.Status,                    // Status
+		Role:                      input.Role,                      // Role (BCA, BCAStaff, etc.)
+		VendorName:                input.VendorName,                // Vendor name
+		ManagerName:               input.ManagerName,               // Manager name
+		Address:                   input.Address,                   // Address
+		City:                      input.City,                      // City
+		State:                     input.State,                     // State
+		GST:                       input.GST,                       // GST
+		Country:                   input.Country,                   // Country
+		AdditionalRemark:          input.AdditionalRemark,          // Additional remark
+		HasStaffAccess:            input.HasStaffAccess,            // Has staff access
+		VerificationCode:          input.VerificationCode,          // Verification code
+		VerificationCodeTimestamp: input.VerificationCodeTimestamp, // Verification code timestamp
+		OtpBlockEndTime:           input.OtpBlockEndTime,           // OTP block end time
+		SES_URL:                   input.SES_URL,                   // SES URL
+		EmailBannerImage:          input.EmailBannerImage,          // Email banner image
+		CompanyTitle:              input.CompanyTitle,              // Company title
+		OtpAttempts:               input.OtpAttempts,               // OTP attempts
+		CreatedAt:                 now,                             // Creation time
+		UpdatedAt:                 now,                             // Last updated time
 	}
 
 	_, err = collection.InsertOne(ctx, newUser)

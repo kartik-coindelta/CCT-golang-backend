@@ -21,7 +21,7 @@ func VerifyOTP(c *gin.Context) {
 		return
 	}
 
-	collections := []string{"company", "BCA", "user"}
+	collections := []string{"companies", "bcas", "users"}
 	for _, collectionName := range collections { // Corrected here
 		collection := db.GetCollection(collectionName)
 		ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
@@ -35,7 +35,7 @@ func VerifyOTP(c *gin.Context) {
 		var id string
 
 		switch collectionName {
-		case "company":
+		case "companies":
 			var company models.Company
 			result = &company
 			err := collection.FindOne(ctx, filter).Decode(result)
@@ -51,7 +51,7 @@ func VerifyOTP(c *gin.Context) {
 			role = *company.Role
 			id = company.ID.Hex()
 
-		case "BCA":
+		case "bcas":
 			var bca models.BCA
 			result = &bca
 			err := collection.FindOne(ctx, filter).Decode(result)
@@ -67,21 +67,21 @@ func VerifyOTP(c *gin.Context) {
 			role = *bca.Role
 			id = bca.ID.Hex()
 
-		case "user":
-			var user models.User
-			result = &user
-			err := collection.FindOne(ctx, filter).Decode(result)
-			if err != nil {
-				if err.Error() == "mongo: no documents in result" {
-					continue // No document found, continue to the next collection
-				}
-				c.JSON(http.StatusInternalServerError, gin.H{"error": "Error retrieving data"})
-				return
-			}
-			storedOTP = user.VerificationCode
-			storedTimestamp = user.VerificationCodeTimestamp
-			role = *user.Role
-			id = user.ID.Hex()
+			// case "users":
+			// 	var user models.User
+			// 	result = &user
+			// 	err := collection.FindOne(ctx, filter).Decode(result)
+			// 	if err != nil {
+			// 		if err.Error() == "mongo: no documents in result" {
+			// 			continue // No document found, continue to the next collection
+			// 		}
+			// 		c.JSON(http.StatusInternalServerError, gin.H{"error": "Error retrieving data"})
+			// 		return
+			// 	}
+			// 	storedOTP = user.VerificationCode
+			// 	storedTimestamp = user.VerificationCodeTimestamp
+			// 	role = *user.Role
+			// 	id = user.ID.Hex()
 		}
 
 		// Check OTP

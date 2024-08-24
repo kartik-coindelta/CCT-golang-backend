@@ -6,9 +6,9 @@ import (
 	"go.mongodb.org/mongo-driver/bson/primitive"
 )
 
-// User represents a user in the MongoDB database
+// User represents the schema for users in MongoDB.
 type User struct {
-	ID                        primitive.ObjectID  `bson:"_id,omitempty" json:"id,omitempty"`
+	ID                        primitive.ObjectID  `bson:"_id,omitempty" json:"_id,omitempty"`
 	FirstName                 *string             `bson:"firstName,omitempty" json:"firstName,omitempty"`
 	LastName                  *string             `bson:"lastName,omitempty" json:"lastName,omitempty"`
 	CaseNumber                *int                `bson:"caseNumber,omitempty" json:"caseNumber,omitempty"`
@@ -22,8 +22,9 @@ type User struct {
 	Gender                    *string             `bson:"gender,omitempty" json:"gender,omitempty"`
 	PhoneNumber               *int                `bson:"phoneNumber,omitempty" json:"phoneNumber,omitempty"`
 	ImgURL                    *string             `bson:"imgURL,omitempty" json:"imgURL,omitempty"`
+	UserWallet                *string             `bson:"userWallet,omitempty" json:"userWallet,omitempty"`
 	Role                      *string             `bson:"role,omitempty" json:"role,omitempty"`
-	CompanyID                 primitive.ObjectID  `bson:"companyId" json:"userId"`
+	CompanyID                 *primitive.ObjectID `bson:"companyId,omitempty" json:"companyId,omitempty"`
 	CaseID                    *primitive.ObjectID `bson:"caseId,omitempty" json:"caseId,omitempty"`
 	VerificationCode          *int                `bson:"verificationCode,omitempty" json:"verificationCode,omitempty"`
 	Address                   *string             `bson:"address,omitempty" json:"address,omitempty"`
@@ -34,6 +35,7 @@ type User struct {
 	Pincode                   *int                `bson:"pincode,omitempty" json:"pincode,omitempty"`
 	Country                   *string             `bson:"country,omitempty" json:"country,omitempty"`
 	VerificationCodeTimestamp *time.Time          `bson:"verificationCodeTimestamp,omitempty" json:"verificationCodeTimestamp,omitempty"`
+	OTPBlockEndTime           *time.Time          `bson:"otpBlockEndTime,omitempty" json:"otpBlockEndTime,omitempty"`
 	CreatedAt                 time.Time           `bson:"createdAt" json:"createdAt"`
 	UpdatedAt                 time.Time           `bson:"updatedAt" json:"updatedAt"`
 }

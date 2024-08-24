@@ -26,7 +26,7 @@ func Login(c *gin.Context) {
 
 	// Check if email is provided
 	if input.Email != nil && *input.Email != "" {
-		collections := []string{"company", "BCA", "user"}
+		collections := []string{"companies", "bcas", "users"}
 		var user models.User
 		var company models.Company
 		var bca models.BCA
@@ -39,11 +39,11 @@ func Login(c *gin.Context) {
 			filter := bson.M{"email": input.Email}
 			var result interface{}
 			switch collectionName {
-			case "BCA":
+			case "bcas":
 				result = &bca
-			case "company":
+			case "companies":
 				result = &company
-			case "user":
+			case "users":
 				result = &user
 			}
 
@@ -87,7 +87,7 @@ func Login(c *gin.Context) {
 
 	// Check if UserName and Password are provided
 	if input.UserName != nil && *input.UserName != "" && input.Password != nil && *input.Password != "" {
-		collections := []string{"company", "BCA", "user"}
+		collections := []string{"companies", "bcas", "users"}
 		var user models.User
 		var company models.Company
 		var bca models.BCA
@@ -100,11 +100,11 @@ func Login(c *gin.Context) {
 			filter := bson.M{"userName": input.UserName}
 			var result interface{}
 			switch collectionName {
-			case "BCA":
+			case "bcas":
 				result = &bca
-			case "company":
+			case "companies":
 				result = &company
-			case "user":
+			case "users":
 				result = &user
 			}
 
@@ -116,15 +116,15 @@ func Login(c *gin.Context) {
 				var id primitive.ObjectID
 
 				switch collectionName {
-				case "BCA":
+				case "bcas":
 					hashedPassword = *bca.Password
 					role = *bca.Role
 					id = bca.ID
-				case "company":
+				case "companies":
 					hashedPassword = *company.Password
 					role = *company.Role
 					id = company.ID
-				case "user":
+				case "users":
 					hashedPassword = *user.Password
 					role = *user.Role
 					id = user.ID

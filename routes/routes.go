@@ -9,12 +9,10 @@ import (
 
 func SetupRoutes(router *gin.Engine) {
 	// Define routes
-	router.POST("/signup", controllers.SignUp)
+	router.POST("/bca", controllers.SignUp)
 	router.POST("/login", controllers.Login)
-	router.POST("/loginCompany", controllers.Login)
-	router.POST("/loginUser", controllers.Login)
-	router.POST("/registerCompany", controllers.RegisterCompany)
-	router.POST("/registerUser", controllers.RegisterUser)
+	router.POST("/company", controllers.RegisterCompany)
+	router.POST("/user", controllers.RegisterUser)
 
 	router.POST("/verifyOTP", middleware.VerifyOTP)
 

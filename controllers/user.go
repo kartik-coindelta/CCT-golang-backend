@@ -56,7 +56,7 @@ func RegisterUser(c *gin.Context) {
 		return
 	}
 
-	collection := db.GetCollection("user") // Assuming User collection
+	collection := db.GetCollection("users") // Assuming User collection
 	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
 	defer cancel()
 
@@ -84,6 +84,7 @@ func RegisterUser(c *gin.Context) {
 	}
 
 	// Create new user
+	companyID := &userID
 	newUser := models.User{
 		ID:                        primitive.NewObjectID(),
 		FirstName:                 input.FirstName,
@@ -99,8 +100,10 @@ func RegisterUser(c *gin.Context) {
 		Gender:                    input.Gender,
 		PhoneNumber:               input.PhoneNumber,
 		ImgURL:                    input.ImgURL,
+		UserWallet:                input.UserWallet,
 		Role:                      input.Role,
-		CompanyID:                 userID,
+		CompanyID:                 companyID,
+		CaseID:                    input.CaseID,
 		VerificationCode:          input.VerificationCode,
 		Address:                   input.Address,
 		Address1:                  input.Address1,
@@ -109,7 +112,8 @@ func RegisterUser(c *gin.Context) {
 		State:                     input.State,
 		Pincode:                   input.Pincode,
 		Country:                   input.Country,
-		VerificationCodeTimestamp: input.VerificationCodeTimestamp,
+		VerificationCodeTimestamp: input.VerificationCodeTimestamp, // Assuming VerificationCodeTimestamp is not provided in the input
+		OTPBlockEndTime:           input.OTPBlockEndTime,           // Assuming OTPBlockEndTime is not provided in the input
 		CreatedAt:                 time.Now(),
 		UpdatedAt:                 time.Now(),
 	}

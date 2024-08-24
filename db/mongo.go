@@ -3,8 +3,10 @@ package db
 import (
 	"context"
 	"log"
+	"os"
 	"sync"
 
+	"github.com/joho/godotenv"
 	"go.mongodb.org/mongo-driver/mongo"
 	"go.mongodb.org/mongo-driver/mongo/options"
 )
@@ -16,22 +18,32 @@ var (
 )
 
 const (
-	CONNECTIONSTRING = "mongodb://localhost:27017"
-	DB               = "CCTdb"
+	DB = "cctDelta"
 )
 
 func init() {
-	clientOptions := options.Client().ApplyURI(CONNECTIONSTRING)
+	// Load environment variables from .env file
+	if err := godotenv.Load(); err != nil {
+		log.Fatalf("Error loading .env file: %v", err)
+	}
+
+	mongoURL := os.Getenv("MONGO_URL")
+	if mongoURL == "" {
+		log.Fatal("MONGO_URL environment variable is not set")
+	}
+
+	clientOptions := options.Client().ApplyURI(mongoURL)
 
 	mongoOnce.Do(func() {
-		clientInstance, clientInstanceError = mongo.Connect(context.TODO(), clientOptions)
-		if clientInstanceError != nil {
-			log.Fatal(clientInstanceError)
+		var err error
+		clientInstance, err = mongo.Connect(context.Background(), clientOptions)
+		if err != nil {
+			log.Fatalf("Failed to connect to MongoDB: %v", err)
 		}
 
-		err := clientInstance.Ping(context.TODO(), nil)
+		err = clientInstance.Ping(context.Background(), nil)
 		if err != nil {
-			log.Fatal(err)
+			log.Fatalf("Failed to ping MongoDB: %v", err)
 		}
 	})
 }
