@@ -27,9 +27,9 @@ type UserVerificationRequest struct {
 	Checks                    []string               `bson:"checks" json:"checks"`
 	ReportDetail              map[string]interface{} `bson:"reportDetail,omitempty" json:"reportDetail,omitempty"`
 	FinalReportInfo           map[string]interface{} `bson:"finalReportInfo,omitempty" json:"finalReportInfo,omitempty"`
-	IsAssigned                bool                   `bson:"isAssigned,omitempty" json:"isAssigned,omitempty"`
-	IsDetailFilled            bool                   `bson:"isDetailFilled,omitempty" json:"isDetailFilled,omitempty"`
-	IsInefficiency            bool                   `bson:"isInefficiency,omitempty" json:"isInefficiency,omitempty"`
+	IsAssigned                bool                   `bson:"isAssigned" json:"isAssigned"`
+	IsDetailFilled            bool                   `bson:"isDetailFilled" json:"isDetailFilled"`
+	IsInefficiency            bool                   `bson:"isInefficiency" json:"isInefficiency"`
 	EducationTaskId           *primitive.ObjectID    `bson:"educationTaskId,omitempty" json:"educationTaskId,omitempty"`
 	ExperienceTaskId          *primitive.ObjectID    `bson:"experienceTaskId,omitempty" json:"experienceTaskId,omitempty"`
 	CertificateTaskId         *primitive.ObjectID    `bson:"certificateTaskId,omitempty" json:"certificateTaskId,omitempty"`
@@ -55,15 +55,15 @@ type UserVerificationRequest struct {
 	RazorpayInvoiceUrl        *string                `bson:"razorpayInvoiceUrl,omitempty" json:"razorpayInvoiceUrl,omitempty"`
 	RequestedDate             time.Time              `bson:"requestedDate,omitempty" json:"requestedDate,omitempty"`
 	DeadlineDate              time.Time              `bson:"deadlineDate,omitempty" json:"deadlineDate,omitempty"`
-	IsREEDDSURPRISE           bool                   `bson:"isREEDDSURPRISE,omitempty" json:"isREEDDSURPRISE,omitempty"`
-	IsREEDDAPPOINTMENT        bool                   `bson:"isREEDDAPPOINTMENT,omitempty" json:"isREEDDAPPOINTMENT,omitempty"`
-	IsEDD                     bool                   `bson:"isEDD,omitempty" json:"isEDD,omitempty"`
-	IsDISCRETE                bool                   `bson:"isDISCRETE,omitempty" json:"isDISCRETE,omitempty"`
-	IsKEI                     bool                   `bson:"isKEI,omitempty" json:"isKEI,omitempty"`
-	IsVOLO                    bool                   `bson:"isVOLO,omitempty" json:"isVOLO,omitempty"`
+	IsREEDDSURPRISE           bool                   `bson:"isREEDDSURPRISE" json:"isREEDDSURPRISE"`
+	IsREEDDAPPOINTMENT        bool                   `bson:"isREEDDAPPOINTMENT" json:"isREEDDAPPOINTMENT"`
+	IsEDD                     bool                   `bson:"isEDD" json:"isEDD"`
+	IsDISCRETE                bool                   `bson:"isDISCRETE" json:"isDISCRETE"`
+	IsKEI                     bool                   `bson:"isKEI" json:"isKEI"`
+	IsVOLO                    bool                   `bson:"isVOLO" json:"isVOLO"`
 	FinalReportDate           *time.Time             `bson:"finalReportDate,omitempty" json:"finalReportDate,omitempty"`
-	ReferredByCompany         bool                   `bson:"referredByCompany,omitempty" json:"referredByCompany,omitempty"`
-	IsDeleted                 bool                   `bson:"isDeleted,omitempty" json:"isDeleted,omitempty"`
+	ReferredByCompany         bool                   `bson:"referredByCompany" json:"referredByCompany"`
+	IsDeleted                 bool                   `bson:"isDeleted" json:"isDeleted"`
 	CreatedAt                 time.Time              `bson:"createdAt,omitempty" json:"createdAt,omitempty"`
 	UpdatedAt                 time.Time              `bson:"updatedAt,omitempty" json:"updatedAt,omitempty"`
 }

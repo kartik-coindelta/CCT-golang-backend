@@ -7,6 +7,7 @@ import (
 )
 
 func CompanyRoutes(router *gin.Engine) {
-	router.GET("company/:id", company.GetCompanyById)
-	router.GET("company/getCompany", company.GetCompany)
+	router.GET("/:id", company.GetCompanyById)
+	router.GET("/", company.GetCompany)
+	router.GET("/BCAId", company.GetCompanyByBCAId)
 }

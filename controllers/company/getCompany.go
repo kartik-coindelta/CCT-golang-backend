@@ -12,7 +12,7 @@ import (
 )
 
 func GetCompany(c *gin.Context) {
-	collection := db.GetCollection("company")
+	collection := db.GetCollection("companies")
 	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
 	defer cancel()
 

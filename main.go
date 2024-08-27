@@ -13,5 +13,5 @@ func main() {
 	routes.SetupRoutes(router)
 
 	// Start the server
-	router.Run(":8080")
+	router.Run(":8081")
 }

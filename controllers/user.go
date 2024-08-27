@@ -112,8 +112,8 @@ func RegisterUser(c *gin.Context) {
 		State:                     input.State,
 		Pincode:                   input.Pincode,
 		Country:                   input.Country,
-		VerificationCodeTimestamp: input.VerificationCodeTimestamp, // Assuming VerificationCodeTimestamp is not provided in the input
-		OTPBlockEndTime:           input.OTPBlockEndTime,           // Assuming OTPBlockEndTime is not provided in the input
+		VerificationCodeTimestamp: input.VerificationCodeTimestamp,
+		OTPBlockEndTime:           input.OTPBlockEndTime,
 		CreatedAt:                 time.Now(),
 		UpdatedAt:                 time.Now(),
 	}

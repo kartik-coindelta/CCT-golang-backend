@@ -15,7 +15,7 @@ import (
 
 // ListUserVerificationRequests handles listing all user verification requests with pagination
 func ListUserVerificationRequests(c *gin.Context) {
-	collection := db.GetCollection("userVerificationRequest")
+	collection := db.GetCollection("userverificationrequest")
 	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
 	defer cancel()
 

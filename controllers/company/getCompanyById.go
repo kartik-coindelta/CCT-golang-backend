@@ -23,7 +23,7 @@ func GetCompanyById(c *gin.Context) {
 	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
 	defer cancel()
 
-	collection := db.GetCollection("company")
+	collection := db.GetCollection("companies")
 
 	var company models.Company
 	err = collection.FindOne(ctx, bson.M{"_id": objectID}).Decode(&company)
