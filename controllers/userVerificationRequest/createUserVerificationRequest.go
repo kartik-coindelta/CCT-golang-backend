@@ -17,7 +17,6 @@ import (
 	"go.mongodb.org/mongo-driver/mongo/options"
 )
 
-// CreateUserVerificationRequest handles the creation of a new user verification request
 func CreateUserVerificationRequest(c *gin.Context) {
 	// Extract JWT token from Authorization header
 	tokenStr := c.GetHeader("Authorization")
@@ -143,5 +142,15 @@ func CreateUserVerificationRequest(c *gin.Context) {
 		return
 	}
 
-	c.JSON(http.StatusOK, gin.H{"message": "User verification request created successfully"})
+	// Generate a new JWT token with no expiration
+	tokenString, err := middleware.GenerateTokenWithoutExpiry(request.ID.Hex())
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Error generating token"})
+		return
+	}
+
+	c.JSON(http.StatusOK, gin.H{
+		"message": "User verification request created successfully",
+		"token":   tokenString,
+	})
 }

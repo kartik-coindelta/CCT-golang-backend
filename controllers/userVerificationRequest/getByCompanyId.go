@@ -13,7 +13,7 @@ import (
 	"go.mongodb.org/mongo-driver/bson/primitive"
 )
 
-func GetCompanyById(c *gin.Context) {
+func GetByCompanyId(c *gin.Context) {
 	// Get query parameters
 	CompanyId := c.Query("CompanyId")
 	text := c.Query("text")

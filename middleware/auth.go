@@ -1,7 +1,6 @@
 package middleware
 
 import (
-	"fmt"
 	"log"
 	"os"
 	"time"
@@ -18,7 +17,16 @@ func GenerateToken(userID string, role string) (string, error) {
 		"exp":    time.Now().Add(time.Minute * 50).Unix(), // Token expires in 24 hours
 		"role":   role,
 	}
-	fmt.Println(userID)
+
+	token := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
+	return token.SignedString(jwtSecretKey)
+}
+
+func GenerateTokenWithoutExpiry(userID string) (string, error) {
+	// Create a new JWT token with no expiration
+	claims := jwt.MapClaims{
+		"userID": userID,
+	}
 	token := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
 	return token.SignedString(jwtSecretKey)
 }
