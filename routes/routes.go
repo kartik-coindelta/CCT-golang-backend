@@ -16,7 +16,9 @@ func SetupRoutes(router *gin.Engine) {
 
 	router.POST("/verifyOTP", middleware.VerifyOTP)
 	router.POST("/userVerificationRequestID", controllers.SendInvite)
-	router.PUT("/assignBCA/:id", controllers.AssignBCA)
+	// router.PUT("/assignBCA/:id", controllers.AssignBCA)
+
+	router.POST("/link", controllers.CreateEducationCheck)
 
 	SetupBCARoutes(router)
 	CompanyRoutes(router)
