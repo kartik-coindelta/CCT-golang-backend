@@ -18,5 +18,7 @@ func UserVerificationRequestRoutes(router *gin.Engine) {
 		userVerificationRequestGroup.GET("/", controllers.GetUserVerificationRequestById)
 
 		userVerificationRequestGroup.GET("/CompanyId", controllers.GetByCompanyId)
+
+		userVerificationRequestGroup.PUT("/assignBCA/:id", controllers.AssignBCA)
 	}
 }

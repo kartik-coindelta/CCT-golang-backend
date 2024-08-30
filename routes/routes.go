@@ -16,13 +16,30 @@ func SetupRoutes(router *gin.Engine) {
 
 	router.POST("/verifyOTP", middleware.VerifyOTP)
 	router.POST("/userVerificationRequestID", controllers.SendInvite)
-	// router.PUT("/assignBCA/:id", controllers.AssignBCA)
+	
 
-	router.POST("/link", controllers.CreateEducationCheck)
+	
 
 	SetupBCARoutes(router)
 	CompanyRoutes(router)
 	UserRoutes(router)
 
 	UserVerificationRequestRoutes(router)
+	AddressCheck(router)
+	CertificatesCheck(router)
+	CriminalCheck(router)
+	DrugCheck(router)
+	EducationCheck(router)
+	ExperienceCheck(router)
+	GlobalDatabaseCheck(router)
+	IdentityCheck(router)
+	ProfessionalLicenceCheck(router)
+	ReferenceCheck(router)
+	ReputationalCheck(router)
+	SexOffenderCheck(router)
+	SocialMediaCheck(router)
+	UanCheck(router)
+	VideoKycCheck(router)
+	
+
 }

@@ -3,42 +3,38 @@ package controllers
 import (
 	"CCT-GOLANG-BACKEND/db"
 	"CCT-GOLANG-BACKEND/models"
-	"encoding/json"
+	"context"
+	"log"
 	"net/http"
 	"time"
 
-	"go.mongodb.org/mongo-driver/mongo"
+	"github.com/gin-gonic/gin"
 )
 
-// Initialize your MongoDB collection
-var educationCheckCollection *mongo.Collection // Initialize this with your MongoDB collection
+// CreateEducationCheck creates a new EducationCheck document in the database
+func CreateEducationCheck(c *gin.Context) {
+	var educationCheck models.EducationCheck
 
-// CreateEducationCheck handles the creation of a new EducationCheck document.
-func CreateEducationCheck(w http.ResponseWriter, r *http.Request) {
-	var data models.EducationCheck
-
-	// Decode the request body into the EducationCheck struct
-	if err := json.NewDecoder(r.Body).Decode(&data); err != nil {
-		http.Error(w, "Invalid request payload", http.StatusBadRequest)
+	// Bind JSON body to the struct
+	if err := c.ShouldBindJSON(&educationCheck); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid request payload"})
 		return
 	}
 
-	// Set timestamps if needed
-	data.CreatedAt = time.Now()
-	data.UpdatedAt = time.Now()
+	// Get the MongoDB collection
+	collection := db.GetCollection("educationchecks")
 
-	// Call CreateItem to insert the data into MongoDB
-	result, err := db.CreateItem(educationCheckCollection, data, nil)
+	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
+	defer cancel()
+
+	// Insert the document into the collection without transaction
+	result, err := db.CreateItem(collection, educationCheck, ctx)
 	if err != nil {
-		http.Error(w, "Failed to create the EducationCheck", http.StatusInternalServerError)
+		log.Printf("Failed to create EducationCheck: %v", err)
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to create EducationCheck"})
 		return
 	}
 
-	// Respond with the inserted ID and a success message
-	response := map[string]interface{}{
-		"insertedID": result.InsertedID,
-	}
-	w.Header().Set("Content-Type", "application/json")
-	w.WriteHeader(http.StatusCreated)
-	json.NewEncoder(w).Encode(response)
+	// Return a success response
+	c.JSON(http.StatusCreated, result)
 }
