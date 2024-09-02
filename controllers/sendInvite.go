@@ -4,6 +4,7 @@ import (
 	"CCT-GOLANG-BACKEND/db"
 	"CCT-GOLANG-BACKEND/middleware"
 	"context"
+	"fmt"
 	"log"
 	"net/http"
 	"time"
@@ -22,10 +23,11 @@ func SendInvite(c *gin.Context) {
 		c.JSON(http.StatusBadRequest, gin.H{"error": "userVerificationRequestID is required"})
 		return
 	}
-
+	log.Printf("userId:%s", userIDStr)
 	// Convert userVerificationRequestID to ObjectID
 	userVerificationRequestID, err := primitive.ObjectIDFromHex(userIDStr)
 	if err != nil {
+
 		log.Println("Error converting userVerificationRequestID to ObjectID:", err)
 		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid userVerificationRequestID"})
 		return
@@ -61,14 +63,15 @@ func SendInvite(c *gin.Context) {
 	log.Printf("email: %s\n", email)
 	log.Printf("companyName: %s", companyName)
 
-	// Construct the invite URL
-	url := "https://youtube.com"
+	// // Construct the invite URL
+	url := fmt.Sprintf("https://yourdomain.com/redirectToForm?id=%s", userIDStr)
+
 
 	// Send invite email
 	err = middleware.SendInvitation(email, url, companyName)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "Error sending invite email"})
-		return
+		return 
 	}
 
 	c.JSON(http.StatusOK, gin.H{"message": "Invite sent successfully"})
